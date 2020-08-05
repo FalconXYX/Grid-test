@@ -9,6 +9,7 @@ white = (255,255,255)
 red = (255,0,0)
 green = (0,255,0)
 blue = (0,0,255)
+thing = (0, 100, 255)
 class box():
     def __init__(self,x,y,l,w,color,display):
         box.x = x
@@ -19,7 +20,7 @@ class box():
 
     def draw(win,self):
 
-        pygame.draw.rect(display, self.color, (self.x, self.y, self.w, self.l))
+        pygame.draw.rect(display, self.color, (self.x, self.y, self.w, self.l),3)
 
 
 pygame.init()
@@ -35,7 +36,7 @@ display= pygame.display.set_mode((display_width, display_height))
 display.fill((black))
 for i in range(1,10):
     for l in range(1,10):
-        t.append(box((i*50),(l*50),50,50,red,display))
+        t.append(box((i*50),(l*50),50,50,thing,display))
         j+=1
         box.draw(display,box)
 
