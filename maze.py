@@ -130,15 +130,16 @@ def getneighbouring(input):
     except:
         pass
     return neigboors
-
 def makemaze(input_class):
     global currentcell
     global spaceleft
     neighbouringcells  = getneighbouring(input_class)
     lengthofn  = len(neighbouringcells)
     if(lengthofn == 0):
-        spaceleft = False
-        print("done")
+        currentcell = stack.pop()
+        if(len(stack) == 0):
+            spaceleft = False
+            print("done")
     else:
         currentcell = neighbouringcells[random.randint(0, lengthofn-1)]
         currentcell.ispart()
