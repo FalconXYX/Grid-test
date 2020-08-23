@@ -55,6 +55,8 @@ class box():
         self.istack = True
     def is_end(selfself):
         pass
+class player():
+
 pygame.init()
 t = []
 startingthing = 0
