@@ -55,7 +55,33 @@ class box():
         self.istack = True
     def is_end(selfself):
         pass
-class player():
+class person():
+    def __init__(self,x,y,l,w,display):
+        self.x = x
+        self.y = y
+        self.l = l
+        self.w = w
+        self.color = color
+        self.vel = 0.1
+        self.hitbox = (self.x, self.y, self.w, self.l)
+    def move(self):
+
+        if keys[K_ESCAPE]:
+            run = False
+        if keys[pygame.K_a] and self.x > 18:
+            self.x -= self.vel
+            press = True
+        elif keys[pygame.K_d]  and self.x < 494 :
+            self.x += self.vel
+            press = True
+        elif keys[pygame.K_w] and self.y > 18:
+            self.y -= self.vel
+            press = True
+        elif keys[pygame.K_s]  and self.y < 495:
+            self.y += self.vel
+            press = True
+    def draw(self,win):
+        pygame.draw.rect(display, red, (self.x, self.y, self.w, self.w))
 
 pygame.init()
 t = []
@@ -66,12 +92,14 @@ display_width = 560
 display_height =560
 display= pygame.display.set_mode((display_width, display_height))
 def makeboxes():
+
     for i in range(1,b):
         for l in range(1,b):
             t.append(box(i*r,l*r,r,r,bluer,display))
 
 
 makeboxes()
+
 def Make2darray():
     num = 0
     global TDArray
@@ -90,12 +118,14 @@ def setStart(row):
     global startx
     global starty
     global startingclass
+    global player
 
     startingpos = random.randint(0,b-2)
     startingclass  = TDArray[row, startingpos]
     startingclass.isStart()
     startx = startingclass.x
     starty = startingclass.y
+    player = person(startx+2, starty+2, 4, 4, display)
     runmakemaze(startingclass)
 def getneighbourof(input,current):
     cellx = numpy.where(TDArray == input)
@@ -145,8 +175,6 @@ def getneighbourof(input,current):
             iffour.append(trailclass)
     except:
         pass
-    print(len(iffour))
-    print(iffour)
     if(len(iffour) == 4):
         return True
 def getneighbouring(input):
@@ -161,9 +189,8 @@ def getneighbouring(input):
     try:
         trailclass = TDArray[ncordsx, ncordsy]
         isavalid = getneighbourof(trailclass, input)
-        print("no", isavalid)
         if (isavalid == True):
-            print("works")
+
             neigboors.append(trailclass)
     except:
         pass
@@ -172,7 +199,6 @@ def getneighbouring(input):
     try:
         trailclass = TDArray[ncordsx, ncordsy]
         isavalid = getneighbourof(trailclass, input)
-        print("no", isavalid)
         if(isavalid == True):
             neigboors.append(trailclass)
 
@@ -183,7 +209,6 @@ def getneighbouring(input):
     try:
         trailclass = TDArray[ncordsx, ncordsy]
         isavalid = getneighbourof(trailclass, input)
-        print("no", isavalid)
         if (isavalid == True):
             neigboors.append(trailclass)
     except:
@@ -193,7 +218,7 @@ def getneighbouring(input):
     try:
         trailclass = TDArray[ncordsx, ncordsy]
         isavalid = getneighbourof(trailclass, input)
-        print(isavalid)
+
         if (isavalid == True):
             neigboors.append(trailclass)
     except:
@@ -227,14 +252,13 @@ def makemaze(input_class):
         stack.append(currentcell)
         for cells in neighbouringcells:
             pass
-
-
 def runmakemaze(start):
     global currentcell
     global spaceleft
     makemaze(start)
     while(spaceleft == True):
         makemaze(currentcell)
+
 
 stack = []
 spaceleft = True
@@ -243,18 +267,23 @@ pygame.display.set_caption("Maze")
 while run:
 
     display.fill((black))
+
     for event in pygame.event.get():
         if event.type ==pygame.QUIT:
             run  = False
-
+    keys = pygame.key.get_pressed()
+    player.move()
     random.randint(0,b)
     for r in TDArray:
         for c in r:
             c.draw(display)
+
     pygame.draw.rect(display, red, (15, 15, 486, 486), 4)
-    #pygame.draw.rect(display, black, (startx-10, starty, 26.129032258064516, 16.329032258064516))
-    #pygame.draw.rect(display, green, (startx, starty, 16.129032258064516, 16.129032258064516), 2)
-    pygame.draw.rect(display, red, (endx, endy, 16.129032258064516, 16.129032258064516), 2)
+    #pygame.draw.rect(display, black, (startx-10, starty, 26.129032258064516, 15.329032258064516))
+    player.draw(display)
+    player.hitbox = (player.x, player.y, player.w, player.l)
+    pygame.draw.rect(display, green, (startx, starty, 16.129032258064516, 16.129032258064516), 2)
+    #pygame.draw.rect(display, red, (endx, endy, 16.129032258064516, 16.129032258064516), 2)
 
     pygame.display.update()
 
