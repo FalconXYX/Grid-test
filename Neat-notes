@@ -1,0 +1,95 @@
+Inputs:
+-x
+-y
+-Distance from end
+Outputs
+-Move up(w)
+-Move Down(s)
+-Move left(a)
+-Move Right(d)
+Activation Function:
+-TanH
+Pop Size:
+-75
+Fitness Function:
+-Time alive
+-Distance from the end
+Max Gen-30
+
+    net = neat.nn.FeedForwardNetwork(g,config)
+        nets.append(net)
+        g.fitness =0
+        ge.append(g)
+
+    stack = []
+    spaceleft = True
+    setStart(0)
+    pygame.display.set_caption("Maze")
+    while run:
+        clock.tick(60)
+        display.fill((black))
+        for event in pygame.event.get():
+            if event.type ==pygame.QUIT:
+                run  = False
+        keys = pygame.key.get_pressed()
+        for player in players:
+            player.move()
+        random.randint(0,b)
+        for r in TDArray:
+            for c in r:
+                c.draw(display)
+                xw = c.x+c.w
+                yw = c.y+c.w
+                for player in players:
+                    if (c.inmaze == False):
+                        if(player.x > c.x and player.x < xw):
+                            if(player.y > c.y and player.y < yw):
+                                x= players.index(player)
+                                ge[x].fitness -=1
+                                players.pop(x)
+                                ge.pop(x)
+                                nets.pop(x)
+
+                    if (c.inmaze == True):
+                        if(player.x > endx and player.x < endx+c.w):
+                            if(player.y > endy and player.y < endy+c.w):
+                                ge[x].fitness +=25
+        for player in players:
+            x = players.index(player)
+            ge[x].fitness += 0.001
+
+
+
+        pygame.draw.rect(display, red, (15, 15, 486, 486), 4)
+        #pygame.draw.rect(display, black, (startx-10, starty, 26.129032258064516, 15.329032258064516))
+        for player in players:
+            player.draw(display)
+        pygame.draw.rect(display, green, (startx, starty, 16.129032258064516, 16.129032258064516), 2)
+        pygame.draw.rect(display, red, (endx, endy, 16.129032258064516, 16.129032258064516), 2)
+
+        pygame.display.update()
+
+def runsim(config_file):
+    config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction,
+                         neat.DefaultSpeciesSet, neat.DefaultStagnation,
+                         config_file)
+    # Create the population, which is the top-level object for a NEAT run.
+    p = neat.Population(config)
+    # Add a stdout reporter to show progress in the terminal.
+    p.add_reporter(neat.StdOutReporter(True))
+    stats = neat.StatisticsReporter()
+    p.add_reporter(stats)
+    #p.add_reporter(neat.Checkpointer(5))
+    # Run for up to 50 generations.
+    winner = p.run(main, 75)
+    # show final stats
+    print('\nBest genome:\n{!s}'.format(winner))
+
+
+
+local_dir = os.path.dirname(__file__)
+config_path = os.path.join(local_dir, 'config-feedforward.txt')
+runsim(config_path)
+main()
+pygame.quit()
+quit()

@@ -7,6 +7,8 @@ import pyinputplus as pyip
 import random
 import numpy
 from array import *
+import neat
+import math
 black = (0,0,0)
 white = (255,255,255)
 red = (255,0,0)
@@ -30,6 +32,7 @@ class box():
         self.vistited = False
         self.inmaze  = False
         self.istack = False
+        self.istart = False
     def draw(self,win):
         if(self.hitboxstatus == True):
             if(b >33):
@@ -43,6 +46,7 @@ class box():
         self.boxstatus = False
         self.vistited = True
         self.inmaze = True
+        self.istart = True
     def ispart(self):
         self.hitboxstatus = False
         self.boxstatus = False
@@ -54,8 +58,12 @@ class box():
         self.vistited = False
     def is_stack(self):
         self.istack = True
-    def is_end(selfself):
-        pass
+    def is_end(self):
+        global endx
+        global endy
+        self.color = red
+        endx = self.x
+        endy = self.y
 class person():
     def __init__(self,x,y,l,w,display):
         self.x = x
@@ -63,25 +71,15 @@ class person():
         self.l = l
         self.w = w
         self.color = color
-        self.vel = 0.1
+        self.vel = 0.2
         self.deaths = 0
+        self.distance = 1
         self.hitbox = (self.x, self.y, self.w, self.l)
+        self.count = 0
     def move(self):
 
         if keys[K_ESCAPE]:
             run = False
-        if keys[pygame.K_a] and self.x > 21:
-            self.x -= self.vel
-            press = True
-        elif keys[pygame.K_d]  and self.x < 494 :
-            self.x += self.vel
-            press = True
-        elif keys[pygame.K_w] and self.y > 18:
-            self.y -= self.vel
-            press = True
-        elif keys[pygame.K_s]  and self.y < 495:
-            self.y += self.vel
-            press = True
     def draw(self,win):
         pygame.draw.rect(display, red, (self.x, self.y, self.w, self.w))
     def death(self,win):
@@ -94,7 +92,7 @@ pygame.init()
 t = []
 startingthing = 0
 j=0
-run = True
+
 display_width = 560
 display_height =560
 display= pygame.display.set_mode((display_width, display_height))
@@ -119,17 +117,11 @@ def Make2darray():
 Make2darray()
 global startingclass
 def setStart(row):
-    global startx
-    global starty
     global startingclass
-    global player
-
     startingpos = random.randint(0,b-2)
     startingclass  = TDArray[row, startingpos]
     startingclass.isStart()
-    startx = startingclass.x
-    starty = startingclass.y
-    player = person(startx+4, starty+2, 4, 4, display)
+    print(startingclass.isStart())
     runmakemaze(startingclass)
 def getneighbourof(input,current):
     cellx = numpy.where(TDArray == input)
@@ -239,8 +231,6 @@ def makemaze(input_class):
     if(lengthofn == 0):
         if (startingthing == 0):
             startingthing = 1
-            endx = currentcell.y
-            endy = currentcell.x
             currentcell.is_end()
 
         currentcell = stack.pop()
@@ -262,46 +252,153 @@ def runmakemaze(start):
     makemaze(start)
     while(spaceleft == True):
         makemaze(currentcell)
-
-
 stack = []
 spaceleft = True
 setStart(0)
-pygame.display.set_caption("Maze")
-while run:
 
-    display.fill((black))
+clock = pygame.time.Clock()
+def main(genomes, config):
+    global spaceleft
+    global stack
+    global keys
+    global distance
+    runpygame = True
 
-    for event in pygame.event.get():
-        if event.type ==pygame.QUIT:
-            run  = False
-    keys = pygame.key.get_pressed()
-    player.move()
-    random.randint(0,b)
-    for r in TDArray:
-        for c in r:
-            c.draw(display)
-            xw = c.x+c.w
-            yw = c.y+c.w
-            if(player.x > c.x and player.x < xw):
-                if(player.y > c.y and player.y < yw):
-                    if(c.inmaze == False):
-                       player.death(display)
+    pygame.display.set_caption("Maze")
+    players = []
+    ge = []
+    nets = []
+    for _,g in genomes:
+        for s in TDArray[0]:
+            if (s.istart == True):
+                starty = s.y
+                startx = s.x
+        players.append(person(startx + 4, starty + 2, 4, 4, display))
+        net = neat.nn.FeedForwardNetwork.create(g, config)
+        nets.append(net)
+        g.fitness = 0
+        ge.append(g)
+
+    while runpygame:
+        clock.tick(60)
+
+        display.fill((black))
+        for event in pygame.event.get():
+            if event.type ==pygame.QUIT:
+                runpygame  = False
+                pygame.quit()
+                quit()
+        keys = pygame.key.get_pressed()
+        if (len(players) < 1):
+            runpygame == False
+            break
+
+        for player in players:
+            player.move()
+            noaction = True
+            number = players.index(player)
+            p = [player.x,player.y,player.distance]
+            output = nets[number].activate(p)
+            if output[0] >= 0.5 and output[0] <= 1:
+                if (player.y > 18):
+                    player.y -= player.vel
+                    noaction == False
+            if output[0] >= 0 and output[0] <= 0.5:
+                if player.x > 21:
+                    player.x -= player.vel
+                    noaction == False
+            if output[0] >= 0 and output[0] <= -0.5:
+                if player.y < 495:
+                    player.y += player.vel
+                    noaction == False
+            if output[0] >= -0.5 and output[0] <= -1:
+                if player.x < 494:
+                        player.x += player.vel
+                        noaction == False
+            if(noaction == True):
+                player.count +=1
+                if(player.count > 150):
+                    ge[number].fitness -= 1
+                    players.pop(number)
+                    ge.pop(number)
+                    nets.pop(number)
+                    player.count = 0
+
+        random.randint(0,b)
+
+        for r in TDArray:
+            for c in r:
+                c.draw(display)
+                xw = c.x+c.w
+                yw = c.y+c.w
+                for player in players:
+                    if (c.inmaze == False):
+                        if(player.x > c.x and player.x < xw):
+                            if(player.y > c.y and player.y < yw):
+
+                                x= players.index(player)
+                                ge[x].fitness -=3
+                                players.pop(x)
+                                ge.pop(x)
+                                nets.pop(x)
+                                try:
+                                    additive = 45-(player.distance / 10)
+                                    print(additive)
+                                    ge[x].fitness += additive
+                                except:
+                                    runpygame == False
+                                    break
 
 
 
 
-    pygame.draw.rect(display, red, (15, 15, 486, 486), 4)
-    #pygame.draw.rect(display, black, (startx-10, starty, 26.129032258064516, 15.329032258064516))
-    player.draw(display)
-    player.hitbox = (player.x, player.y, player.w, player.l)
-    pygame.draw.rect(display, green, (startx, starty, 16.129032258064516, 16.129032258064516), 2)
-    pygame.draw.rect(display, red, (endx, endy, 16.129032258064516, 16.129032258064516), 2)
-
-    pygame.display.update()
 
 
+                    if (c.inmaze == True):
+                        if(player.x > endx and player.x < endx+c.w):
+                            if(player.y > endy and player.y < endy+c.w):
+                                ge[x].fitness == 1000
+        for player in players:
+            x = players.index(player)
+            ge[x].fitness += 0.01
+
+        for player in players:
+            xdiff = player.x
+            ydiff = player.y
+            xdiff = xdiff*xdiff
+            ydiff = ydiff*ydiff
+            distance = xdiff+ydiff
+            player.distance  = round(math.sqrt(distance))
+
+        pygame.draw.rect(display, red, (15, 15, 486, 486), 4)
+        #pygame.draw.rect(display, black, (startx-10, starty, 26.129032258064516, 15.329032258064516))
+        for player in players:
+            player.draw(display)
+        pygame.draw.rect(display, green, (startx, starty, 16.129032258064516, 16.129032258064516), 2)
+        pygame.draw.rect(display, red, (endx, endy, 16.129032258064516, 16.129032258064516), 2)
+        pygame.display.update()
 
 
-pygame.quit()
-quit()
+def runsim(config_file):
+    config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction,
+                         neat.DefaultSpeciesSet, neat.DefaultStagnation,
+                         config_file)
+    # Create the population, which is the top-level object for a NEAT run.
+    p = neat.Population(config)
+    # Add a stdout reporter to show progress in the terminal.
+    p.add_reporter(neat.StdOutReporter(True))
+    stats = neat.StatisticsReporter()
+    p.add_reporter(stats)
+    #p.add_reporter(neat.Checkpointer(5))
+    # Run for up to 50 generations.
+    winner = p.run(main, 75)
+    # show final stats
+    print('\nBest genome:\n{!s}'.format(winner))
+
+
+
+local_dir = os.path.dirname(__file__)
+config_path = os.path.join(local_dir, 'config-feedforward.txt')
+runsim(config_path)
+
+

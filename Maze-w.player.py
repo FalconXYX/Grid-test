@@ -7,6 +7,7 @@ import pyinputplus as pyip
 import random
 import numpy
 from array import *
+import math
 black = (0,0,0)
 white = (255,255,255)
 red = (255,0,0)
@@ -54,8 +55,12 @@ class box():
         self.vistited = False
     def is_stack(self):
         self.istack = True
-    def is_end(selfself):
-        pass
+    def is_end(self):
+        global endx
+        global endy
+        self.color = red
+        endx = self.x
+        endy = self.y
 class person():
     def __init__(self,x,y,l,w,display):
         self.x = x
@@ -129,7 +134,7 @@ def setStart(row):
     startingclass.isStart()
     startx = startingclass.x
     starty = startingclass.y
-    player = person(startx+4, starty+2, 4, 4, display)
+
     runmakemaze(startingclass)
 def getneighbourof(input,current):
     cellx = numpy.where(TDArray == input)
@@ -239,8 +244,6 @@ def makemaze(input_class):
     if(lengthofn == 0):
         if (startingthing == 0):
             startingthing = 1
-            endx = currentcell.y
-            endy = currentcell.x
             currentcell.is_end()
 
         currentcell = stack.pop()
@@ -268,6 +271,7 @@ stack = []
 spaceleft = True
 setStart(0)
 pygame.display.set_caption("Maze")
+player = person(startx+4, starty+2, 4, 4, display)
 while run:
 
     display.fill((black))
@@ -283,13 +287,14 @@ while run:
             c.draw(display)
             xw = c.x+c.w
             yw = c.y+c.w
-            if(player.x > c.x and player.x < xw):
-                if(player.y > c.y and player.y < yw):
-                    if(c.inmaze == False):
-                       player.death(display)
-
-
-
+            if (c.inmaze == False):
+                if(player.x > c.x and player.x < xw):
+                    if(player.y > c.y and player.y < yw):
+                        player.death(display)
+            if (c.inmaze == True):
+                if(player.x > endx and player.x < endx+c.w):
+                    if(player.y > endy and player.y < endy+c.w):
+                        player.death(display)
 
     pygame.draw.rect(display, red, (15, 15, 486, 486), 4)
     #pygame.draw.rect(display, black, (startx-10, starty, 26.129032258064516, 15.329032258064516))
