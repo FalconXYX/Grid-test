@@ -314,7 +314,7 @@ def main(genomes, config):
             if output[0] >= -0.5 and output[0] <= -1:
                 if player.x < 494:
                         player.x += player.vel
-                        noaction == False
+                        noaction == False    
             if(noaction == True):
                 player.count +=1
                 if(player.count > 150):
