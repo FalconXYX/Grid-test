@@ -206,11 +206,7 @@ def makemaze(input_class):
     neighbouringcells  = getneighbouring(input_class)
     lengthofn  = len(neighbouringcells)
     if(lengthofn == 0):
-        if (startingthing == 0):
-            startingthing = 1
-            endx = currentcell.y
-            endy = currentcell.x
-            currentcell.is_end()
+
 
         currentcell = stack.pop()
         currentcell.is_stack()
@@ -225,6 +221,17 @@ def makemaze(input_class):
         stack.append(currentcell)
         for cells in neighbouringcells:
             pass
+    half1 = round(len(TDArray[1]) / 2) - 1
+    half2 = round(len(TDArray[1]) / 2) - 1
+    middle = TDArray[half1][half2]
+    for x in range(0, 5):
+        if (middle.inmaze == True):
+            middle.is_end()
+            break
+        else:
+            half1 += 1
+            half2 += 1
+            middle = TDArray[half1][half2]
 
 
 def runmakemaze(start):

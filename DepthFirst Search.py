@@ -7,6 +7,7 @@ import pyinputplus as pyip
 import random
 import numpy
 from array import *
+import neat
 import math
 black = (0,0,0)
 white = (255,255,255)
@@ -31,6 +32,7 @@ class box():
         self.vistited = False
         self.inmaze  = False
         self.istack = False
+        self.istart = False
     def draw(self,win):
         if(self.hitboxstatus == True):
             if(b >33):
@@ -44,7 +46,13 @@ class box():
         self.boxstatus = False
         self.vistited = True
         self.inmaze = True
+        self.istart = True
     def ispart(self):
+        self.hitboxstatus = False
+        self.boxstatus = False
+        self.vistited = True
+        self.inmaze = True
+    def isdef(self):
         self.hitboxstatus = False
         self.boxstatus = False
         self.vistited = True
@@ -68,25 +76,15 @@ class person():
         self.l = l
         self.w = w
         self.color = color
-        self.vel = 0.1
+        self.vel = 0.2
         self.deaths = 0
+        self.distance = 1
         self.hitbox = (self.x, self.y, self.w, self.l)
+        self.count = 0
     def move(self):
 
         if keys[K_ESCAPE]:
             run = False
-        if keys[pygame.K_a] and self.x > 21:
-            self.x -= self.vel
-            press = True
-        elif keys[pygame.K_d]  and self.x < 494 :
-            self.x += self.vel
-            press = True
-        elif keys[pygame.K_w] and self.y > 18:
-            self.y -= self.vel
-            press = True
-        elif keys[pygame.K_s]  and self.y < 495:
-            self.y += self.vel
-            press = True
     def draw(self,win):
         pygame.draw.rect(display, red, (self.x, self.y, self.w, self.w))
     def death(self,win):
@@ -99,7 +97,7 @@ pygame.init()
 t = []
 startingthing = 0
 j=0
-run = True
+
 display_width = 560
 display_height =560
 display= pygame.display.set_mode((display_width, display_height))
@@ -124,17 +122,11 @@ def Make2darray():
 Make2darray()
 global startingclass
 def setStart(row):
-    global startx
-    global starty
     global startingclass
-    global player
-
     startingpos = random.randint(0,b-2)
     startingclass  = TDArray[row, startingpos]
     startingclass.isStart()
-    startx = startingclass.x
-    starty = startingclass.y
-
+    print(startingclass.isStart())
     runmakemaze(startingclass)
 def getneighbourof(input,current):
     cellx = numpy.where(TDArray == input)
@@ -242,6 +234,7 @@ def makemaze(input_class):
     neighbouringcells  = getneighbouring(input_class)
     lengthofn  = len(neighbouringcells)
     if(lengthofn == 0):
+
         currentcell = stack.pop()
         currentcell.is_stack()
 
@@ -255,67 +248,203 @@ def makemaze(input_class):
         stack.append(currentcell)
         for cells in neighbouringcells:
             pass
-    half1 = round(len(TDArray[1]) / 2) - 1
-    half2 = round(len(TDArray[1]) / 2) - 1
+    half1 = round(len(TDArray[1]) / 2)-1
+    half2 = round(len(TDArray[1]) / 2)-1
     middle = TDArray[half1][half2]
-    for x in range(0, 5):
-        if (middle.inmaze == True):
+    for x in range(0,5):
+        if(middle.inmaze == True):
             middle.is_end()
             break
         else:
             half1 += 1
             half2 += 1
             middle = TDArray[half1][half2]
-
-
 def runmakemaze(start):
     global currentcell
     global spaceleft
     makemaze(start)
     while(spaceleft == True):
         makemaze(currentcell)
+def getneighbourofdepth(input,current):
+    cellx = numpy.where(TDArray == input)
+    cellx = cellx[0]
+    celly = numpy.where(TDArray == input)
+    celly = celly[1]
+    iffour = []
+    ncordsx = int(cellx)
+    ncordsy = int(celly + 1)
+
+    try:
+        trailclass = TDArray[ncordsx, ncordsy]
+        if (trailclass.isdef != True):
+            iffour.append(trailclass)
+        elif (trailclass == current):
+            iffour.append(trailclass)
+    except:
+        pass
+    ncordsx = int(cellx)
+    ncordsy = int(celly - 1)
+    try:
+        trailclass = TDArray[ncordsx, ncordsy]
+        if (trailclass.isdef != True):
+            iffour.append(trailclass)
+        elif (trailclass == current):
+            iffour.append(trailclass)
+
+    except:
+        pass
+    ncordsx = int(cellx + 1)
+    ncordsy = int(celly)
+    try:
+        trailclass = TDArray[ncordsx, ncordsy]
+        if (trailclass.isdef != True):
+            iffour.append(trailclass)
+        elif (trailclass == current):
+            iffour.append(trailclass)
+    except:
+        pass
+    ncordsx = int(cellx - 1)
+    ncordsy = int(celly)
+    try:
+        trailclass = TDArray[ncordsx, ncordsy]
+        if(trailclass.isdef != True):
+            iffour.append(trailclass)
+        elif(trailclass == current):
+            iffour.append(trailclass)
+    except:
+        pass
+    if(len(iffour) == 4):
+        return True
+def getneighbouringdepth(input):
+    cellx = numpy.where(TDArray == input)
+    cellx = cellx[0]
+    celly = numpy.where(TDArray == input)
+    celly = celly[1]
+    neigboors = []
+    ncordsx = int(cellx)
+    ncordsy = int(celly + 1)
+
+    try:
+        trailclass = TDArray[ncordsx, ncordsy]
+        isavalid = getneighbourofdepth(trailclass, input)
+        if (isavalid == True):
+
+            neigboors.append(trailclass)
+    except:
+        pass
+    ncordsx = int(cellx)
+    ncordsy = int(celly - 1)
+    try:
+        trailclass = TDArray[ncordsx, ncordsy]
+        isavalid = getneighbourofdepth(trailclass, input)
+        if(isavalid == True):
+            neigboors.append(trailclass)
+
+    except:
+        pass
+    ncordsx = int(cellx + 1)
+    ncordsy = int(celly)
+    try:
+        trailclass = TDArray[ncordsx, ncordsy]
+        isavalid = getneighbourofdepth(trailclass, input)
+        if (isavalid == True):
+            neigboors.append(trailclass)
+    except:
+        pass
+    ncordsx = int(cellx - 1)
+    ncordsy = int(celly)
+    try:
+        trailclass = TDArray[ncordsx, ncordsy]
+        isavalid = getneighbourofdepth(trailclass, input)
+
+        if (isavalid == True):
+            neigboors.append(trailclass)
+    except:
+        pass
+    return neigboors
+def depth(input_class):
+    global currentcell
+    global startingthing
+    global spaceleft
+    global endx
+    global endy
+    neighbouringcells  = getneighbouringdepth(input_class)
+    lengthofn  = len(neighbouringcells)
+    if(lengthofn == 0):
 
 
+
+        if(len(stack) == 0):
+           spaceleft = False
+           print("fail")
+    else:
+        currentcell = neighbouringcells[random.randint(0, lengthofn-1)]
+        currentcell.ispart()
+        currentcell.isvisited()
+        stack.append(currentcell)
+        for cells in neighbouringcells:
+            pass
+def runmakedepth(start):
+    global currentcell
+    global spaceleft
+    depth(start)
+    while(spaceleft == True):
+        depth(currentcell)
 stack = []
 spaceleft = True
 setStart(0)
-pygame.display.set_caption("Maze")
-player = person(startx+4, starty+2, 4, 4, display)
-while run:
 
-    display.fill((black))
+clock = pygame.time.Clock()
+def main():
+    global spaceleft
+    global stack
+    global keys
+    global distance
+    runpygame = True
 
-    for event in pygame.event.get():
-        if event.type ==pygame.QUIT:
-            run  = False
-    keys = pygame.key.get_pressed()
-    player.move()
-    random.randint(0,b)
-    for r in TDArray:
-        for c in r:
-            c.draw(display)
-            xw = c.x+c.w
-            yw = c.y+c.w
-            if (c.inmaze == False):
-                if(player.x > c.x and player.x < xw):
-                    if(player.y > c.y and player.y < yw):
-                        player.death(display)
-            if (c.inmaze == True):
-                if(player.x > endx and player.x < endx+c.w):
-                    if(player.y > endy and player.y < endy+c.w):
-                        player.death(display)
+    pygame.display.set_caption("Maze")
+    players = []
+    ge = []
+    nets = []
 
-    pygame.draw.rect(display, red, (15, 15, 486, 486), 4)
-    #pygame.draw.rect(display, black, (startx-10, starty, 26.129032258064516, 15.329032258064516))
-    player.draw(display)
-    player.hitbox = (player.x, player.y, player.w, player.l)
-    pygame.draw.rect(display, green, (startx, starty, 16.129032258064516, 16.129032258064516), 2)
-    pygame.draw.rect(display, red, (endx, endy, 16.129032258064516, 16.129032258064516), 2)
+    for s in TDArray[0]:
+        if (s.istart == True):
+            starty = s.y
+            startx = s.x
+            players.append(person(startx + 4, starty + 2, 4, 4, display))
 
-    pygame.display.update()
+    while runpygame:
+        clock.tick(60)
+
+        display.fill((black))
+        for event in pygame.event.get():
+            if event.type ==pygame.QUIT:
+                runpygame  = False
+                pygame.quit()
+                quit()
 
 
 
 
-pygame.quit()
-quit()
+
+
+
+        random.randint(0,b)
+
+        for r in TDArray:
+            for c in r:
+                c.draw(display)
+                xw = c.x+c.w
+                yw = c.y+c.w
+
+
+
+        pygame.draw.rect(display, red, (15, 15, 486, 486), 4)
+        #pygame.draw.rect(display, black, (startx-10, starty, 26.129032258064516, 15.329032258064516))
+
+        pygame.draw.rect(display, green, (startx, starty, 16.129032258064516, 16.129032258064516), 2)
+        pygame.draw.rect(display, red, (endx, endy, 16.129032258064516, 16.129032258064516), 2)
+        pygame.display.update()
+
+main()
+
