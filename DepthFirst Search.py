@@ -9,8 +9,8 @@ import numpy
 from array import *
 import neat
 import math
-global button
-button = false
+global button, endx, endy
+button = True
 black = (0,0,0)
 white = (255,255,255)
 red = (255,0,0)
@@ -246,6 +246,7 @@ def makemaze(input_class):
     half2 = round(len(TDArray[1]) / 2)-1
     middle = TDArray[half1][half2]
     for x in range(0,5):
+
         if(middle.inmaze == True):
             middle.is_end()
             break
@@ -364,8 +365,10 @@ def depth(input_class):
     global endy
     neighbouringcells  = getneighbouringdepth(input_class)
     lengthofn  = len(neighbouringcells)
-    if(currentcell.isend == True):
+    if(currentcell.x == endx and currentcell.y == endy):
         print("done solving")
+        print(currentcell.x, currentcell.y)
+        print(endx,endy)
         return True
     if(lengthofn == 0):
         currentcell = stack.pop()
@@ -389,7 +392,7 @@ def runmakedepth(start):
     depth(start)
     done = False
     while(True):
-        print("hi")
+
         done = depth(currentcell)
         if(done == True):
             break
@@ -447,7 +450,7 @@ def main():
         pygame.draw.rect(display, red, (15, 15, 486, 486), 4)
         #pygame.draw.rect(display, black, (startx-10, starty, 26.129032258064516, 15.329032258064516))
 
-        pygame.draw.rect(display, green, (startx, starty, 16.129032258064516, 16.129032258064516), 2)
+        pygame.draw.rect(display, white, (startx, starty, 16.129032258064516, 16.129032258064516), 2)
         pygame.draw.rect(display, red, (endx, endy, 16.129032258064516, 16.129032258064516), 2)
         pygame.display.update()
 
