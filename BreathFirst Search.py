@@ -16,7 +16,7 @@ white = (255,255,255)
 red = (255,0,0)
 green = (0,255,0)
 blue = (0,0,255)
-bluer = (0, 5000, 255)
+bluer = (0, 100, 255)
 r=31
 b= r
 r = 500/r
@@ -43,9 +43,9 @@ class box():
             if(b >33):
                 pygame.draw.rect(display, self.color, (self.x, self.y,  self.w,  self.w))
             elif (b >45):
-                pygame.draw.rect(display, blue, (self.x, self.y,  self.w,  self.w))
+                pygame.draw.rect(display, self.color, (self.x, self.y,  self.w,  self.w))
             else:
-                pygame.draw.rect(display, blue, (self.x, self.y, self.w,  self.w))
+                pygame.draw.rect(display, self.color, (self.x, self.y, self.w,  self.w))
         if (self.isdepth == True and button == True):
             if (b > 33):
                 pygame.draw.rect(display, self.color, (self.x, self.y, self.w-0.5, self.w-0.5))
@@ -121,7 +121,7 @@ def setStart(row):
     startingclass.isStart()
     print(startingclass.isStart())
     runmakemaze(startingclass)
-
+    runmakedepth(startingclass)
 def getneighbourof(input,current):
     cellx = numpy.where(TDArray == input)
     cellx = cellx[0]
@@ -261,7 +261,7 @@ def runmakemaze(start):
     while(spaceleft == True):
         makemaze(currentcell)
 
-def getneighbouringdepth(input, loops):
+def getneighbouringdepth(input):
     cellx = numpy.where(TDArray == input)
     cellx = cellx[0]
     celly = numpy.where(TDArray == input)
@@ -271,10 +271,10 @@ def getneighbouringdepth(input, loops):
     ncordsy = int(celly + 1)
 
     try:
-
         trailclass = TDArray[ncordsx, ncordsy]
         isavalid = trailclass.inmaze == True
         if (isavalid == True):
+
             neigboors.append(trailclass)
     except:
         pass
@@ -283,8 +283,7 @@ def getneighbouringdepth(input, loops):
     try:
         trailclass = TDArray[ncordsx, ncordsy]
         isavalid = trailclass.inmaze == True
-
-        if(isavalid == True ):
+        if(isavalid == True):
             neigboors.append(trailclass)
 
     except:
@@ -294,10 +293,8 @@ def getneighbouringdepth(input, loops):
     try:
         trailclass = TDArray[ncordsx, ncordsy]
         isavalid = trailclass.inmaze == True
-
         if (isavalid == True):
-           neigboors.append(trailclass)
-
+            neigboors.append(trailclass)
     except:
         pass
     ncordsx = int(cellx - 1)
@@ -311,64 +308,40 @@ def getneighbouringdepth(input, loops):
     except:
         pass
     return neigboors
-def depth(input_class, loops):
+def depth(input_class):
     global currentcell
     global startingthing
     global spaceleft
     global endx
     global endy
-    neighbouringcells  = getneighbouringdepth(input_class, loops)
+    neighbouringcells  = getneighbouringdepth(input_class)
     lengthofn  = len(neighbouringcells)
-
-    if(currentcell.x == endx and currentcell.y == endy):
+    if(input_class.x == endx and input_class.y == endy):
         print("done solving")
-        print(currentcell.x, currentcell.y)
-        print(endx,endy)
+
+        print(endx,endy) 
         return True
-    if(lengthofn == 0):
-        currentcell = stack.pop()
-        currentcell.is_stack()
-
-
-        if(len(stack) == 0):
-           print("fail")
-           print(loops)
 
     else:
 
-        currentcell = neighbouringcells[random.randint(0, lengthofn-1)]
-        currentcell.isdef() 
-        currentcell.isvisited()
-        stack.append(currentcell)
-
+        for cell in neighbouringcells:
+            cell.isdef()
+            cell.isvisited()
+            stack.append(cell)
+        currentcell = neighbouringcells
 def runmakedepth(start):
     global currentcell
-    global stack
+    global spaceleft
 
-    stack = []
-    loops = 0
-    now = time.time()
-    depth(start, loops)
+    depth(start)
     done = False
     while(True):
-
-        done = depth(currentcell, loops)
-        loops+=1
-        if (loops % 100 == 0):
-            for r in TDArray:
-                for c in r:
-                    c.draw(display)
-                    xw = c.x + c.w
-                    yw = c.y + c.w
-            time.sleep(0.01)
-
-        if(done == True):
-            print("It took: " + str(loops) + " loops to sort")
-            timetook = round((time.time() - now), 3)
-            print("It took: " + str(timetook) + " seconds to sort ")
-            avg = round(timetook / loops, 6)
-            print("Each action took on average: " + str(avg) + " milliseconds")
-            break
+        for cell in currentcell:
+            print(currentcell)
+            done = depth(cell)
+            if(done == True):
+                print("done set")
+                break
 
 stack = []
 spaceleft = True
@@ -393,7 +366,7 @@ def main():
             starty = s.y
             startx = s.x
 
-    runmakedepth(startingclass)
+
     while runpygame:
         clock.tick(60)
 
@@ -421,7 +394,7 @@ def main():
 
 
         pygame.draw.rect(display, red, (15, 15, 486, 486), 4)
-        #pygame.draw.rect(display, black, (startx-11, starty, 26.129032258064516, 15.329032258064516))
+        #pygame.draw.rect(display, black, (startx-10, starty, 26.129032258064516, 15.329032258064516))
 
         pygame.draw.rect(display, white, (startx, starty, 16.129032258064516, 16.129032258064516), 2)
         pygame.draw.rect(display, red, (endx, endy, 16.129032258064516, 16.129032258064516), 2)
