@@ -341,34 +341,7 @@ def depth(input_class, loops):
         currentcell.isvisited()
         stack.append(currentcell)
 
-def runmakedepth(start):
-    global currentcell
-    global stack
 
-    stack = []
-    loops = 0
-    now = time.time()
-    depth(start, loops)
-    done = False
-    while(True):
-
-        done = depth(currentcell, loops)
-        loops+=1
-        if (loops % 100 == 0):
-            for r in TDArray:
-                for c in r:
-                    c.draw(display)
-                    xw = c.x + c.w
-                    yw = c.y + c.w
-            time.sleep(0.01)
-
-        if(done == True):
-            print("It took: " + str(loops) + " loops to sort")
-            timetook = round((time.time() - now), 3)
-            print("It took: " + str(timetook) + " seconds to sort ")
-            avg = round(timetook / loops, 6)
-            print("Each action took on average: " + str(avg) + " milliseconds")
-            break
 
 stack = []
 spaceleft = True
@@ -393,7 +366,7 @@ def main():
             starty = s.y
             startx = s.x
 
-    runmakedepth(startingclass)
+
     while runpygame:
         clock.tick(60)
 
@@ -411,21 +384,47 @@ def main():
 
 
         random.randint(0,b)
+        global currentcell
+        global stack
 
-        for r in TDArray:
-            for c in r:
-                c.draw(display)
-                xw = c.x+c.w
-                yw = c.y+c.w
+        stack = []
+        loops = 0
+        now = time.time()
+        depth(startingclass, loops)
+        done = False
+        while (True):
+
+            done = depth(currentcell, loops)
+            loops += 1
+
+            for r in TDArray:
+                for c in r:
+                    c.draw(display)
+                    xw = c.x + c.w
+                    yw = c.y + c.w
+            pygame.draw.rect(display, red, (15, 15, 486, 486), 4)
+            # pygame.draw.rect(display, black, (startx-11, starty, 26.129032258064516, 15.329032258064516))
+
+            pygame.draw.rect(display, white, (startx, starty, 16.129032258064516, 16.129032258064516), 2)
+            pygame.draw.rect(display, red, (endx, endy, 16.129032258064516, 16.129032258064516), 2)
+            pygame.display.update()
+
+            time.sleep(0.01)
+
+            if (done == True):
+                print("It took: " + str(loops) + " loops to sort")
+                timetook = round((time.time() - now), 3)
+                print("It took: " + str(timetook) + " seconds to sort ")
+                avg = round(timetook / loops, 6)
+                print("Each action took on average: " + str(avg) + " milliseconds")
+
+                sys.exit()
 
 
 
-        pygame.draw.rect(display, red, (15, 15, 486, 486), 4)
-        #pygame.draw.rect(display, black, (startx-11, starty, 26.129032258064516, 15.329032258064516))
 
-        pygame.draw.rect(display, white, (startx, starty, 16.129032258064516, 16.129032258064516), 2)
-        pygame.draw.rect(display, red, (endx, endy, 16.129032258064516, 16.129032258064516), 2)
-        pygame.display.update()
+
+
 
 main()
 
