@@ -46,7 +46,7 @@ for i in range(1,b):
         box.draw(display,box)
 
 
-
+print(t)
 
 
 pygame.display.set_caption("Maze")

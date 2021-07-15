@@ -9,18 +9,18 @@ import numpy
 from array import *
 import neat
 import math
-global button, endx, endy
+import openpyxl
+global button, endx, endy, lastcell, currentcell
 button = True
 black = (0,0,0)
 white = (255,255,255)
 red = (255,0,0)
 green = (0,255,0)
 blue = (0,0,255)
-bluer = (0, 100, 255)
+bluer = (0, 5000, 255)
 r=31
 b= r
 r = 500/r
-
 class box():
     def __init__(self,x,y,l,w,color,display):
         self.x = x
@@ -34,18 +34,20 @@ class box():
         self.vistited = False
         self.inmaze  = False
         self.istack = False
+        self.isstack = False
         self.istart = False
         self.isend = False
         self.isdepth = False
+        self.iscurrentcell = False
     def draw(self,win):
         global button
         if(self.hitboxstatus == True):
             if(b >33):
                 pygame.draw.rect(display, self.color, (self.x, self.y,  self.w,  self.w))
             elif (b >45):
-                pygame.draw.rect(display, self.color, (self.x, self.y,  self.w,  self.w))
+                pygame.draw.rect(display, blue, (self.x, self.y,  self.w,  self.w))
             else:
-                pygame.draw.rect(display, self.color, (self.x, self.y, self.w,  self.w))
+                pygame.draw.rect(display, blue, (self.x, self.y, self.w,  self.w))
         if (self.isdepth == True and button == True):
             if (b > 33):
                 pygame.draw.rect(display, self.color, (self.x, self.y, self.w-0.5, self.w-0.5))
@@ -53,6 +55,23 @@ class box():
                 pygame.draw.rect(display, self.color, (self.x, self.y, self.w-0.5, self.w-0.5))
             else:
                 pygame.draw.rect(display, self.color, (self.x, self.y, self.w-0.5, self.w-0.5))
+        if (self.isdepth == True and button == True and self.iscurrentcell == True):
+            if (b > 33):
+                pygame.draw.rect(display, red, (self.x, self.y, self.w-0.5, self.w-0.5))
+            elif (b > 45):
+                pygame.draw.rect(display, red, (self.x, self.y, self.w-0.5, self.w-0.5))
+            else:
+                pygame.draw.rect(display, red, (self.x, self.y, self.w-0.5, self.w-0.5))
+
+        if (self.isdepth == True and button == True and self.isstack == True):
+
+
+            if (b > 33):
+                pygame.draw.rect(display, white, (self.x, self.y, self.w - 0.5, self.w - 0.5))
+            elif (b > 45):
+                pygame.draw.rect(display, white, (self.x, self.y, self.w - 0.5, self.w - 0.5))
+            else:
+                pygame.draw.rect(display, white, (self.x, self.y, self.w - 0.5, self.w - 0.5))
     def isStart(self):
         self.hitboxstatus = False
         self.boxstatus = False
@@ -77,6 +96,8 @@ class box():
         self.vistited = False
     def is_stack(self):
         self.istack = True
+    def is_instack(self):
+        self.isstack = True
     def is_end(self):
         global endx
         global endy
@@ -84,8 +105,8 @@ class box():
         self.color = red
         endx = self.x
         endy = self.y
-
-
+    def iscurrent(self):
+        self.iscurrentcell = True
 pygame.init()
 t = []
 startingthing = 0
@@ -119,9 +140,10 @@ def setStart(row):
     startingpos = random.randint(0,b-2)
     startingclass  = TDArray[row, startingpos]
     startingclass.isStart()
-    print(startingclass.isStart())
+
+    startingclass.isdepth == True
     runmakemaze(startingclass)
-    runmakedepth(startingclass)
+
 def getneighbourof(input,current):
     cellx = numpy.where(TDArray == input)
     cellx = cellx[0]
@@ -234,7 +256,7 @@ def makemaze(input_class):
 
         if(len(stack) == 0):
            spaceleft = False
-           print("done")
+
     else:
         currentcell = neighbouringcells[random.randint(0, lengthofn-1)]
         currentcell.ispart()
@@ -260,8 +282,7 @@ def runmakemaze(start):
     makemaze(start)
     while(spaceleft == True):
         makemaze(currentcell)
-
-def getneighbouringdepth(input):
+def getneighbouringdepth(input, loops, lastcell):
     cellx = numpy.where(TDArray == input)
     cellx = cellx[0]
     celly = numpy.where(TDArray == input)
@@ -270,31 +291,31 @@ def getneighbouringdepth(input):
     ncordsx = int(cellx)
     ncordsy = int(celly + 1)
 
-    try:
-        trailclass = TDArray[ncordsx, ncordsy]
-        isavalid = trailclass.inmaze == True
-        if (isavalid == True):
 
-            neigboors.append(trailclass)
-    except:
-        pass
+
+    trailclass = TDArray[ncordsx, ncordsy]
+    isavalid = trailclass.inmaze == True
+
+    if (isavalid and trailclass != lastcell and trailclass.isdepth == False):
+        neigboors.append(trailclass)
     ncordsx = int(cellx)
     ncordsy = int(celly - 1)
-    try:
-        trailclass = TDArray[ncordsx, ncordsy]
-        isavalid = trailclass.inmaze == True
-        if(isavalid == True):
-            neigboors.append(trailclass)
+    trailclass = TDArray[ncordsx, ncordsy]
+    isavalid = trailclass.inmaze == True
 
-    except:
-        pass
+    if (isavalid and trailclass != lastcell and trailclass.isdepth == False):
+        neigboors.append(trailclass)
+
+
     ncordsx = int(cellx + 1)
     ncordsy = int(celly)
     try:
         trailclass = TDArray[ncordsx, ncordsy]
         isavalid = trailclass.inmaze == True
-        if (isavalid == True):
-            neigboors.append(trailclass)
+
+        if (isavalid and trailclass != lastcell and trailclass.isdepth == False):
+           neigboors.append(trailclass)
+
     except:
         pass
     ncordsx = int(cellx - 1)
@@ -303,45 +324,52 @@ def getneighbouringdepth(input):
         trailclass = TDArray[ncordsx, ncordsy]
         isavalid = trailclass.inmaze == True
 
-        if (isavalid == True):
+        if (isavalid and trailclass != lastcell and trailclass.isdepth == False):
             neigboors.append(trailclass)
     except:
         pass
     return neigboors
-def depth(input_class):
+def depth(input_class, loops, prev):
+    
     global currentcell
     global startingthing
-    global spaceleft
-    global endx
-    global endy
-    neighbouringcells  = getneighbouringdepth(input_class)
+    global spaceleft, endx, endy, lastcell, stack
+
+    lastcell = prev
+    neighbouringcells  = getneighbouringdepth(input_class, loops, lastcell)
     lengthofn  = len(neighbouringcells)
-    if(input_class.x == endx and input_class.y == endy):
-        print("done solving")
+    times = 0
+    stack = list(dict.fromkeys(stack))
+    if(currentcell.x == endx and currentcell.y == endy):
 
-        print(endx,endy) 
+        print(currentcell.x, currentcell.y)
+        print(endx,endy)
         return True
+    if(lengthofn == 0):
 
+        go = stack.pop(len(stack)-1)
+        currentcell = go
     else:
+        ban = False
+        for r in TDArray:
+            for c in r:
+                c.iscurrentcell = False
 
-        for cell in neighbouringcells:
-            cell.isdef()
-            cell.isvisited()
-            stack.append(cell)
-        currentcell = neighbouringcells
-def runmakedepth(start):
-    global currentcell
-    global spaceleft
 
-    depth(start)
-    done = False
-    while(True):
-        for cell in currentcell:
-            print(currentcell)
-            done = depth(cell)
-            if(done == True):
-                print("done set")
-                break
+        if((lengthofn > 1 or loops < 2) and ban == False):
+            stack.append(currentcell)
+            currentcell.is_instack()
+
+
+        lastcell = currentcell
+        currentcell = neighbouringcells[random.randint(0, lengthofn-1)]
+        currentcell.isdef() 
+        currentcell.isvisited()
+        currentcell.iscurrent()
+
+
+
+
 
 stack = []
 spaceleft = True
@@ -353,19 +381,17 @@ def main():
     global spaceleft
     global stack
     global keys
-    global distance
+    global distance, lastcell
     runpygame = True
 
     pygame.display.set_caption("Maze")
-    players = []
-    ge = []
-    nets = []
+
 
     for s in TDArray[0]:
         if (s.istart == True):
             starty = s.y
             startx = s.x
-
+    
 
     while runpygame:
         clock.tick(60)
@@ -384,21 +410,61 @@ def main():
 
 
         random.randint(0,b)
-
-        for r in TDArray:
-            for c in r:
-                c.draw(display)
-                xw = c.x+c.w
-                yw = c.y+c.w
+        global currentcell
+        global lastcell
+        global stack, banned
 
 
+        stack = [startingclass]
+        banned = []
+        loops = 0
+        now = time.time()
+        depth(startingclass, loops, startingclass)
+        done = False
 
-        pygame.draw.rect(display, red, (15, 15, 486, 486), 4)
-        #pygame.draw.rect(display, black, (startx-10, starty, 26.129032258064516, 15.329032258064516))
+        while (True):
 
-        pygame.draw.rect(display, white, (startx, starty, 16.129032258064516, 16.129032258064516), 2)
-        pygame.draw.rect(display, red, (endx, endy, 16.129032258064516, 16.129032258064516), 2)
-        pygame.display.update()
+            done = depth(currentcell, loops, lastcell)
+
+            loops += 1
+
+            for r in TDArray:
+                for c in r:
+                    c.draw(display)
+                    xw = c.x + c.w
+                    yw = c.y + c.w
+                    
+
+            pygame.draw.rect(display, red, (15, 15, 486, 486), 4)
+            # pygame.draw.rect(display, black, (startx-11, starty, 26.129032258064516, 15.329032258064516))
+
+            pygame.draw.rect(display, white, (startx, starty, 16.129032258064516, 16.129032258064516), 2)
+            pygame.draw.rect(display, red, (endx, endy, 16.129032258064516, 16.129032258064516), 2)
+            pygame.display.update()
+
+
+
+            if (done == True):
+                print("It took: " + str(loops) + " loops to sort")
+                timetook = round((time.time() - now), 3)
+                print("It took: " + str(timetook) + " seconds to sort ")
+                avg = round(timetook / loops, 6)
+                print("Each action took on average: " + str(avg) + " milliseconds")
+                wb = openpyxl.load_workbook('avg.xlsx')
+                sheet = wb['1']  # Get a sheet from the workbook.
+                anotherSheet = wb.active
+                c1val = sheet["C1"].value
+                c1 = sheet["C1"]
+                c1.value =int(c1val+1)
+                writing = sheet["A"+str(c1val)]
+                writing.value = timetook
+                wb.save("avg.xlsx")
+                return
+
+
+
+
+
 
 main()
 
