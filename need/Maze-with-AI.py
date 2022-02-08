@@ -308,6 +308,8 @@ def main(genomes, config):
             number = players.index(player)
             p = [player.x,player.y,player.distance]
             output = nets[number].activate(p)
+
+
             if output[0] >= 0.5 and output[0] <= 1:
                 if (player.y > 18):
                     player.y -= player.vel
@@ -327,7 +329,7 @@ def main(genomes, config):
             if(noaction == True):
                 player.count +=1
                 if(player.count > 150):
-                    ge[number].fitness -= 1
+                    ge[number].fitness -= 10
                     players.pop(number)
                     ge.pop(number)
                     nets.pop(number)
@@ -380,7 +382,7 @@ def main(genomes, config):
             player.distance  = round(math.sqrt(distance))
 
         pygame.draw.rect(display, red, (15, 15, 486, 486), 4)
-        #pygame.draw.rect(display, black, (startx-10, starty, 26.129032258064516, 15.329032258064516))
+        pygame.draw.rect(display, black, (startx-10, starty, 26.129032258064516, 15.329032258064516))
         for player in players:
             player.draw(display)
         pygame.draw.rect(display, green, (startx, starty, 16.129032258064516, 16.129032258064516), 2)
@@ -389,6 +391,7 @@ def main(genomes, config):
 
 
 def runsim(config_file):
+
     config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, neat.DefaultStagnation,
                          config_file)
@@ -398,15 +401,16 @@ def runsim(config_file):
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
-    #p.add_reporter(neat.Checkpointer(5))
+    p.add_reporter(neat.Checkpointer(5))
     # Run for up to 50 generations.
-    winner = p.run(main, 75)
+    winner = p.run(main, 705)
     # show final stats
     print('\nBest genome:\n{!s}'.format(winner))
 
 
 
 local_dir = os.path.dirname(__file__)
+
 config_path = os.path.join(local_dir, 'config-feedforward.txt')
 runsim(config_path)
 
