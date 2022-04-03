@@ -409,8 +409,7 @@ def main():
             pygame.draw.rect(display, red, (endx, endy, 16.129032258064516, 16.129032258064516), 2)
             pygame.display.update()
 
-            time.sleep(0.01)
-
+            
             if (done == True):
                 print("It took: " + str(loops) + " loops to sort")
                 timetook = round((time.time() - now), 3)

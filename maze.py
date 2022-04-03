@@ -259,7 +259,7 @@ while run:
     pygame.draw.rect(display, red, (15, 15, 486, 486), 4)
     #pygame.draw.rect(display, black, (startx-10, starty, 26.129032258064516, 16.329032258064516))
     #pygame.draw.rect(display, green, (startx, starty, 16.129032258064516, 16.129032258064516), 2)
-    pygame.draw.rect(display, red, (endx, endy, 16.129032258064516, 16.129032258064516), 2)
+    #pygame.draw.rect(display, red, (44, 44, 16.129032258064516, 16.129032258064516), 2)
 
     pygame.display.update()
 

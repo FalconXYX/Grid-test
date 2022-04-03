@@ -367,10 +367,6 @@ def depth(input_class, loops, prev):
         currentcell.isvisited()
         currentcell.iscurrent()
 
-
-
-
-
 stack = []
 spaceleft = True
 setStart(0)
@@ -449,16 +445,17 @@ def main():
                 timetook = round((time.time() - now), 3)
                 print("It took: " + str(timetook) + " seconds to sort ")
                 avg = round(timetook / loops, 6)
-                print("Each action took on average: " + str(avg) + " milliseconds")
+                print("Each action took on average: " + str(avg) + " seconds")
+                '''
                 wb = openpyxl.load_workbook('avg.xlsx')
-                sheet = wb['1']  # Get a sheet from the workbook.
+                                    sheet = wb['1']  # Get a sheet from the workbook.
                 anotherSheet = wb.active
                 c1val = sheet["C1"].value
                 c1 = sheet["C1"]
                 c1.value =int(c1val+1)
                 writing = sheet["A"+str(c1val)]
                 writing.value = timetook
-                wb.save("avg.xlsx")
+                wb.save("avg.xlsx")'''
                 return
 
 
