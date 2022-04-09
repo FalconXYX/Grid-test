@@ -1,15 +1,16 @@
-import pygame
-from pygame.locals import *
+import math
 import os
+import random
 import sys
 import time
-import pyinputplus as pyip
-import random
-import numpy
 from array import *
-import neat
-import math
+
+import numpy
 import openpyxl
+import pygame
+import pyinputplus as pyip
+from pygame.locals import *
+
 global button, endx, endy, lastcell, currentcell
 button = True
 black = (0,0,0)
