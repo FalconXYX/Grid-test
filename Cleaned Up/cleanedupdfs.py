@@ -281,7 +281,7 @@ def main(startclass):
     global spaceleft
     global stack
     global keys
-    global distance, lastcell
+    global distance, lastcell 
     runpygame = True
     pygame.display.set_caption("Maze")
     while runpygame:
