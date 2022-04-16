@@ -67,7 +67,7 @@ class person():
         self.y = y
         self.l = l
         self.w = w
-        self.color = color
+        self.color = red
         self.vel = 0.1
         self.deaths = 0
         self.hitbox = (self.x, self.y, self.w, self.l)

@@ -12,6 +12,7 @@ import pyinputplus as pyip
 from pygame.locals import *
 import make2Darray
 import box
+import makeboxes
 global button, lastcell, currentcell
 button = True
 black = (0,0,0)
@@ -29,14 +30,7 @@ display= pygame.display.set_mode((display_width, display_height))
 pygame.init()
 t = []
 startingthing = 0
-j=0
-
-def makeboxes():
-
-    for i in range(1,b):
-        for l in range(1,b):
-            t.append(box.part(i*r,l*r,r,r,black,display))
-makeboxes()
+t = makeboxes.main(b,r,display)
 TDArray = make2Darray.main(b,t)
 
 def setStart(row):
