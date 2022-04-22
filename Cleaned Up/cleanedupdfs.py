@@ -10,9 +10,11 @@ import openpyxl
 import pygame
 import pyinputplus as pyip
 from pygame.locals import *
-import make2Darray
+
 import box
+import make2Darray
 import makeboxes
+
 global button, lastcell, currentcell
 button = True
 black = (0,0,0)
@@ -44,7 +46,7 @@ def setStart(row):
     startingclass.inmaze = True
     startingclass.istart = True
     return startingclass
-
+    
 def getneighbourof(input,current):
     cellx = numpy.where(TDArray == input)
     cellx = cellx[0]
