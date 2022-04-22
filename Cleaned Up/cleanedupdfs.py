@@ -14,6 +14,7 @@ from pygame.locals import *
 import box
 import make2Darray
 import makeboxes
+import getn
 
 global button, lastcell, currentcell
 button = True
@@ -46,110 +47,14 @@ def setStart(row):
     startingclass.inmaze = True
     startingclass.istart = True
     return startingclass
-    
-def getneighbourof(input,current):
-    cellx = numpy.where(TDArray == input)
-    cellx = cellx[0]
-    celly = numpy.where(TDArray == input)
-    celly = celly[1]
-    iffour = []
-    ncordsx = int(cellx)
-    ncordsy = int(celly + 1)
 
-    try:
-        trailclass = TDArray[ncordsx, ncordsy]
-        if (trailclass.vistited != True):
-            iffour.append(trailclass)
-        elif (trailclass == current):
-            iffour.append(trailclass)
-    except:
-        pass
-    ncordsx = int(cellx)
-    ncordsy = int(celly - 1)
-    try:
-        trailclass = TDArray[ncordsx, ncordsy]
-        if (trailclass.vistited != True):
-            iffour.append(trailclass)
-        elif (trailclass == current):
-            iffour.append(trailclass)
-
-    except:
-        pass
-    ncordsx = int(cellx + 1)
-    ncordsy = int(celly)
-    try:
-        trailclass = TDArray[ncordsx, ncordsy]
-        if (trailclass.vistited != True):
-            iffour.append(trailclass)
-        elif (trailclass == current):
-            iffour.append(trailclass)
-    except:
-        pass
-    ncordsx = int(cellx - 1)
-    ncordsy = int(celly)
-    try:
-        trailclass = TDArray[ncordsx, ncordsy]
-        if(trailclass.vistited != True):
-            iffour.append(trailclass)
-        elif(trailclass == current):
-            iffour.append(trailclass)
-    except:
-        pass
-    if(len(iffour) == 4):
-        return True
-def getneighbouring(input):
-    cellx = numpy.where(TDArray == input)
-    cellx = cellx[0]
-    celly = numpy.where(TDArray == input)
-    celly = celly[1]
-    neigboors = []
-    ncordsx = int(cellx)
-    ncordsy = int(celly + 1)
-
-    try:
-        trailclass = TDArray[ncordsx, ncordsy]
-        isavalid = getneighbourof(trailclass, input)
-        if (isavalid == True):
-
-            neigboors.append(trailclass)
-    except:
-        pass
-    ncordsx = int(cellx)
-    ncordsy = int(celly - 1)
-    try:
-        trailclass = TDArray[ncordsx, ncordsy]
-        isavalid = getneighbourof(trailclass, input)
-        if(isavalid == True):
-            neigboors.append(trailclass)
-
-    except:
-        pass
-    ncordsx = int(cellx + 1)
-    ncordsy = int(celly)
-    try:
-        trailclass = TDArray[ncordsx, ncordsy]
-        isavalid = getneighbourof(trailclass, input)
-        if (isavalid == True):
-            neigboors.append(trailclass)
-    except:
-        pass
-    ncordsx = int(cellx - 1)
-    ncordsy = int(celly)
-    try:
-        trailclass = TDArray[ncordsx, ncordsy]
-        isavalid = getneighbourof(trailclass, input)
-
-        if (isavalid == True):
-            neigboors.append(trailclass)
-    except:
-        pass
-    return neigboors
 def makemaze(input_class):
     global currentcell
     global startingthing
     global spaceleft
-    neighbouringcells  = getneighbouring(input_class)
+    neighbouringcells  = getn.mainfunc(input_class,TDArray)
     lengthofn  = len(neighbouringcells)
+    print(neighbouringcells)
     if(lengthofn == 0):
         currentcell = stack.pop()
         currentcell.is_stack()
@@ -231,23 +136,18 @@ def getneighbouringdepth(input, loops, lastcell):
         pass
     return neigboors
 def depth(input_class, loops, prev):
-    
     global currentcell
     global startingthing
     global spaceleft, lastcell, stack
-
     lastcell = prev
     neighbouringcells  = getneighbouringdepth(input_class, loops, lastcell)
     lengthofn  = len(neighbouringcells)
     times = 0
     stack = list(dict.fromkeys(stack))
     if(currentcell.x == endcell.x and currentcell.y == endcell.y):
-
         print(currentcell.x, currentcell.y)
-        
         return True
     if(lengthofn == 0):
-
         go = stack.pop(len(stack)-1)
         currentcell = go
     else:
@@ -255,13 +155,9 @@ def depth(input_class, loops, prev):
         for r in TDArray:
             for c in r:
                 c.iscurrentcell = False
-
-
         if((lengthofn > 1 or loops < 2) and ban == False):
             stack.append(currentcell)
             currentcell.is_instack()
-
-
         lastcell = currentcell
         currentcell = neighbouringcells[random.randint(0, lengthofn-1)]
         currentcell.isdef() 
@@ -273,7 +169,6 @@ startingclass = setStart(0)
 endcell = runmakemaze(startingclass)
 clock = pygame.time.Clock()
 def main(startclass):
-
     global spaceleft
     global stack
     global keys
