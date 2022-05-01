@@ -54,7 +54,6 @@ def makemaze(input_class):
     global spaceleft
     neighbouringcells  = getn.mainfunc(input_class,TDArray)
     lengthofn  = len(neighbouringcells)
-    print(neighbouringcells)
     if(lengthofn == 0):
         currentcell = stack.pop()
         currentcell.is_stack()
@@ -169,9 +168,6 @@ startingclass = setStart(0)
 endcell = runmakemaze(startingclass)
 clock = pygame.time.Clock()
 def main(startclass):
-    global spaceleft
-    global stack
-    global keys
     global distance, lastcell 
     runpygame = True
     pygame.display.set_caption("Maze")
